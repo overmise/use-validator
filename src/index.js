@@ -44,6 +44,7 @@ export const useRules = (userDefined) => {
 
             return true
         },
+        email: (value) => true,
         ...userDefined,
     })
 
@@ -115,6 +116,11 @@ export const useValidator = (options = {}) => {
 
         return ruleset.map((rule) => {
             const [method, params] = rule.split(':')
+
+            if (! rules.hasOwnProperty(method)) {
+                console.error(`Error: Rule "${method}" is not defined.`);
+                return
+            }
 
             if (method == 'optional' && ((value == null) || (value == ''))) {
                 return

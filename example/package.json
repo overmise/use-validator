@@ -12,8 +12,9 @@
     "@overmise/use-validator": "file:.."
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm run build:style && react-scripts start",
     "build": "react-scripts build",
+    "build:style": "tailwind build src/tailwind.css -o src/index.css",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
@@ -22,5 +23,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "autoprefixer": "^9.7.4",
+    "postcss-cli": "^7.1.0",
+    "tailwindcss": "^1.2.0"
+  }
 }
