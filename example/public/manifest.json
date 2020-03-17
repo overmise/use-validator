@@ -1,0 +1,8 @@
+{
+  "short_name": "@overmise/use-validator",
+  "name": "@overmise/use-validator",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
