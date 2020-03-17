@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 export const blank = (value) => typeof value == 'undefined' || value == null || value == ''
 
@@ -28,11 +28,27 @@ export const empty = (object) => {
     return is == true
 }
 
+export const filled = (object) => ! empty(object)
+
+export const walk = (object, fn) => {
+    let out = {}
+
+    for (const [key, some] of Object.entries({ ...object })) {
+        if (typeof some == 'object' && (some instanceof Array == false)) {
+            out[key] = walk(some, fn)
+        } else {
+            out[key] = fn(key, some)
+        }
+    }
+
+    return out
+}
+
 export const useRules = (userDefined) => {
     const [rules, setRules] = useState({
         optional: (value) => true,
-        max: (value, length) => (value || '').length <= length,
-        min: (value, length) => (value || '').length >= length,
+        max: (value, length) => (value || '').length >= length,
+        min: (value, length) => (value || '').length <= length,
         present: (value) => typeof value != 'undefined',
         required: (value) => value != '' && value != null,
         url: (value) => {
@@ -44,7 +60,8 @@ export const useRules = (userDefined) => {
 
             return true
         },
-        email: (value) => true,
+        regex: (value, expression) => expression.test(value),
+        email: (value) => /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(value),
         ...userDefined,
     })
 
@@ -53,15 +70,16 @@ export const useRules = (userDefined) => {
 
 export const useMessages = (userDefined) => {
     const [messages, setMessages] = useState({
-        _generic: `There is an error with :attribute`,
+        _default: `There is an error with the field ":attribute"`,
         optional: ``,
-        max: `:attribute is too long`,
-        min: `:attribute is too short`,
-        present: `:attribute is missing`,
-        required: `:attribute is missing`,
-        url: `:attribute is not a valid url`,
+        max: `The field ":attribute" is too long`,
+        min: `The field ":attribute" is too short`,
+        present: `The field ":attribute" is missing`,
+        required: `The field ":attribute" is missing`,
+        url: `The field ":attribute" is not a valid URL`,
         ...userDefined,
     })
+
     return [messages, setMessages]
 }
 
@@ -85,6 +103,13 @@ const useResolver = (data, schema) => {
     }
 
     return resolve(data, schema)
+}
+
+export const useError = () => {
+    const showFirstError = (error) => (error[0] || '')
+    const hasError = (error) => (error || []).length > 0
+
+    return [showFirstError, hasError]
 }
 
 export const useValidator = (options = {}) => {
@@ -118,19 +143,18 @@ export const useValidator = (options = {}) => {
             const [method, params] = rule.split(':')
 
             if (! rules.hasOwnProperty(method)) {
-                console.error(`Error: Rule "${method}" is not defined.`);
+                console.warn(`Warning: Rule "${method}" is not defined.`);
+
                 return
             }
 
-            if (method == 'optional' && ((value == null) || (value == ''))) {
-                return
-            }
+            const message = (messages[method] || messages._default).replace(':attribute', name)
 
             if (typeof params != 'undefined') {
-                return rules[method](value, params.split(',')) == false && messages[method].replace(':attribute', name)
+                return rules[method](value, params.split(',')) == false && message
             }
 
-            return rules[method](value) == false && messages[method].replace(':attribute', name)
+            return rules[method](value) == false && message
         }).filter((error) => {
             return typeof error != 'undefined' && error != false
         })
