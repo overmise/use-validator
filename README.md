@@ -13,7 +13,7 @@ npm install --save @overmise/use-validator
 ## Usage
 
 ```jsx
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useValidator, useError } from '@overmise/use-validator'
 
 const SCHEMA = {
