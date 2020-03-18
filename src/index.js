@@ -47,8 +47,8 @@ export const walk = (object, fn) => {
 export const useRules = (userDefined) => {
     const [rules, setRules] = useState({
         optional: (value) => true,
-        max: (value, length) => (value || '').length >= length,
-        min: (value, length) => (value || '').length <= length,
+        max: (value, length) => (value || '').length <= length,
+        min: (value, length) => (value || '').length >= length,
         present: (value) => typeof value != 'undefined',
         required: (value) => value != '' && value != null,
         url: (value) => {
