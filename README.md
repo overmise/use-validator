@@ -14,21 +14,79 @@ npm install --save @overmise/use-validator
 
 ```jsx
 import React, { Component } from 'react'
+import { useValidator, useError } from '@overmise/use-validator'
 
-import { useMyHook } from '@overmise/use-validator'
+const SCHEMA = {
+    username: '',
+    email: '',
+    password: ''
+}
 
-const Example = () => {
-  const example = useMyHook()
-  return (
-    <div>{example}</div>
-  )
+const Form = () => {
+    const validator = useValidator()
+    const [firstError, hasError] = useError()
+    const [data, setData] = useState(SCHEMA)
+    const [errors, setErrors] = useState(SCHEMA)
+
+    const handleSubmit = (event) => {
+        event.preventDefault()
+
+        const [validates, errors] = validator(data, {
+            username: ['required', 'min:3', 'max:255'],
+            email: ['required', 'email'],
+            password: ['required', 'min:8']
+        })
+
+        setErrors(errors)
+
+        if (validates) {
+            // Perform request...
+            console.log(data)
+        } else {
+            console.error(errors)
+        }
+    }
+
+    return (
+        <form onSubmit={(event) => handleSubmit(event)}>
+            <fieldset>
+                <label htmlFor="username">Username</label>
+                <input
+                    id="username"
+                    name="username"
+                    value={data.username}
+                    onChange={(event) => setData({ ...data, username: event.target.value })}
+                    styles={hasError(errors.username) ? { border: '1px solid red' } : { border: '1px solid #ccc' }}
+                />
+                {hasError(errors.username) && <span>{firstError(errors.username)}</span>}
+            </fieldset>
+            <fieldset>
+                <label htmlFor="email">Email</label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={data.email}
+                    onChange={(event) => setData({ ...data, email: event.target.value })}
+                    styles={hasError(errors.email) ? { border: '1px solid red' } : { border: '1px solid #ccc' }}
+                />
+                {hasError(errors.email) && <span>{firstError(errors.email)}</span>}
+            </fieldset>
+            <fieldset>
+                <label htmlFor="password">Password</label>
+                <input
+                    type="password"
+                    value={data.password}
+                    onChange={(event) => setData({ ...data, password: event.target.value })}
+                    styles={hasError(errors.password) ? { border: '1px solid red' } : { border: '1px solid #ccc' }}
+                />
+                {hasError(errors.password) && <span>{firstError(errors.password)}</span>}
+            </fieldset>
+        </form>
+    )
 }
 ```
 
 ## License
 
-MIT © [benvilliere](https://github.com/benvilliere)
-
----
-
-This hook is created using [create-react-hook](https://github.com/hermanya/create-react-hook).
+MIT © [Ben Villiere](https://github.com/benvilliere)

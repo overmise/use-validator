@@ -14,7 +14,7 @@
   "scripts": {
     "start": "npm run build:style && react-scripts start",
     "build": "react-scripts build",
-    "build:style": "tailwind build src/tailwind.css -o src/index.css",
+    "build:style": "tailwind build src/styles/tailwind.css -o src/index.css",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
