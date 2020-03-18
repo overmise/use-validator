@@ -1,6 +1,6 @@
 {
     "name": "@overmise/use-validator",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "description": "Validation hook for React",
     "author": "benvilliere",
     "license": "MIT",
